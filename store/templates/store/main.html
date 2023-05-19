@@ -1,0 +1,79 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Ecom</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+  <script src="https://kit.fontawesome.com/0ecf21e402.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  <script type="text/javascript">
+    let user = '{{ request.user }}';
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for(let cookie of cookies) {
+          const trimmedCookie = cookie.trim();
+          if (trimmedCookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(trimmedCookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+    let cart = JSON.parse(getCookie('cart'));
+    if (cart === null || cart === undefined){
+      cart = {};
+      console.log('cart created');
+      document.cookie = 'cart=' + JSON.stringify(cart) + ";domain=;path=/";
+    }
+  </script>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg bg-body-tertiary " data-bs-theme="dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="{% url 'store' %}">Ecom</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="{% url 'store' %}">Store</a>
+          </li>
+        </ul>
+        <div class="form-inline my-2 my-lg-0">
+          {% if user.is_authenticated %}
+            Signed in as <strong>{{ user.username }}&ensp;</strong>
+            <a href="{% url 'logout' %}" class="btn btn-warning">Logout</a>
+          {% else %}
+            {% if not request.path == '/login/' %}
+              <a href="{% url 'login' %}"class="btn btn-warning">Login/Register</a>
+            {% endif %}
+          {% endif %}
+          
+          <a href="{% url 'cart' %}">
+            <img  id="cart-icon" src="{% static 'images/cart.png' %}" alt="cart">
+          </a>
+          {% if not request.path == '/login/' %}
+            <span class="align-text-top" id="cart-total">{{ cart_items }}</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </nav>
+  <div class='container'>
+    <br>
+    {% block content %}
+
+    {% endblock content %}
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+  <script src="{% static 'js/cart.js' %}" type="text/javascript" ></script>
+</body>
+</html>
